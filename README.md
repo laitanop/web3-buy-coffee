@@ -149,12 +149,4 @@ This project is open source and available for portfolio use.
 
 Feel free to fork this project and customize it for your own use!
 
-## 📧 Contact
-
-For questions or suggestions, feel free to reach out through the social links in the footer.
-
----
-
-**Note**: This is currently a UI-only implementation. Web3 functionality (wallet connection, smart contract integration, and blockchain transactions) will be added in future updates.
-
 Happy coding! ☕💻
