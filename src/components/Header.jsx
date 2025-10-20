@@ -1,4 +1,5 @@
 import React from "react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Coffee, Wallet } from "lucide-react";
 
 const Header = () => {
@@ -13,10 +14,12 @@ const Header = () => {
             </h1>
           </div>
 
-          <button className="flex items-center gap-2 bg-secondary text-white px-6 py-2.5 rounded-full hover:bg-opacity-90 transition-all duration-200 shadow-md hover:shadow-lg">
+          {/* <button className="flex items-center gap-2 bg-secondary text-white px-6 py-2.5 rounded-full hover:bg-opacity-90 transition-all duration-200 shadow-md hover:shadow-lg">
             <Wallet className="w-5 h-5" />
             <span className="font-semibold">Connect Wallet</span>
-          </button>
+            
+          </button> */}
+          <ConnectButton />
         </div>
       </div>
     </header>
