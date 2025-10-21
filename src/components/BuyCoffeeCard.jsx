@@ -1,34 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Coffee, Send } from "lucide-react";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { coffeeContractAddress, coffeeContractABI } from "../constanstAbi";
 
-const BuyCoffeeCard = ({ onBuyCoffee }) => {
-  const [coffeeCount, setCoffeeCount] = useState(1);
+const BuyCoffeeCard = () => {
+  const { writeContractAsync, isPending, data: hash } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    });
+  const [ethereumPrice, setEthereumPrice] = useState(0);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
+  const coffeePriceInEther = 0.001; // ETH per coffee (example price)
+  const totalPrice = coffeePriceInEther.toFixed(4);
 
-  const coffeePrice = 0.001; // ETH per coffee (example price)
-  const totalPrice = (coffeeCount * coffeePrice).toFixed(4);
+  const getEthereumPrice = async () => {
+    const response = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+    );
+    const data = await response.json();
+    const ethereumPrice = data.ethereum.usd;
 
-  const coffeeOptions = [1, 3, 5];
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onBuyCoffee({
-      coffeeCount,
-      name,
-      message,
-      totalPrice,
-    });
-
-    // Reset form
-    setName("");
-    setMessage("");
-    setCoffeeCount(1);
-
-    // Show success message (you can make this more elegant)
-    alert("Thank you for your support! 🎉\n(Web3 integration coming soon)");
+    setEthereumPrice(ethereumPrice);
   };
 
+  useEffect(() => {
+    getEthereumPrice();
+  }, []);
+  const convertToWei = () => {
+    return (coffeePriceInEther * 10 ** 18).toString();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const txHash = await writeContractAsync({
+        address: coffeeContractAddress,
+        abi: coffeeContractABI,
+        functionName: "buyCoffee",
+        args: [name, message],
+        value: convertToWei(),
+      });
+    } catch (error) {
+      alert(`Transaction failed: ${error.message}`);
+    }
+  };
+
+  // Show success message when transaction is confirmed
+  useEffect(() => {
+    if (isConfirmed) {
+      alert("Thank you for your support! 🎉");
+      setName("");
+      setMessage("");
+    }
+  }, [isConfirmed]);
+
+  if (isPending || isConfirming) {
+    return (
+      <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary mx-auto mb-4"></div>
+          <p className="text-gray-700 font-semibold">
+            {isPending
+              ? "Waiting for wallet approval..."
+              : "Confirming transaction..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
       <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -37,47 +79,6 @@ const BuyCoffeeCard = ({ onBuyCoffee }) => {
       </h3>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Coffee Amount Selection */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
-            Number of Coffees
-          </label>
-          <div className="grid grid-cols-3 gap-3">
-            {coffeeOptions.map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setCoffeeCount(option)}
-                className={`py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${
-                  coffeeCount === option
-                    ? "bg-secondary text-white shadow-lg scale-105"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                <div className="text-2xl mb-1">
-                  {Array(option).fill("☕").join("")}
-                </div>
-                <div className="text-sm">x{option}</div>
-              </button>
-            ))}
-          </div>
-
-          {/* Custom Amount Slider */}
-          <div className="mt-4">
-            <input
-              type="range"
-              min="1"
-              max="10"
-              value={coffeeCount}
-              onChange={(e) => setCoffeeCount(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-secondary"
-            />
-            <div className="text-center mt-2 text-sm text-gray-600">
-              Custom: {coffeeCount} {coffeeCount === 1 ? "coffee" : "coffees"}
-            </div>
-          </div>
-        </div>
-
         {/* Name Input */}
         <div>
           <label
@@ -123,7 +124,7 @@ const BuyCoffeeCard = ({ onBuyCoffee }) => {
             </span>
           </div>
           <div className="text-xs text-gray-600 text-right mt-1">
-            ≈ ${(totalPrice * 2000).toFixed(2)} USD
+            ≈ ${(coffeePriceInEther * ethereumPrice).toFixed(2)} USD
           </div>
         </div>
 
@@ -133,7 +134,7 @@ const BuyCoffeeCard = ({ onBuyCoffee }) => {
           className="w-full bg-gradient-to-r from-secondary to-amber-700 text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105"
         >
           <Send className="w-5 h-5" />
-          Support with {coffeeCount} {coffeeCount === 1 ? "Coffee" : "Coffees"}
+          Support with 1 Coffee
         </button>
       </form>
     </div>
