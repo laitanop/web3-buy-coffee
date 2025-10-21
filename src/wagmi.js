@@ -49,7 +49,7 @@ chains.forEach((chain) => {
   const networkName = alchemyNetworkNames[chain.id];
   transports[chain.id] = http(
     alchemyApiKey && networkName
-      ? `https://${networkName}.g.alchemy.com/v2/${alchemyApiKey}`
+      ? `https://eth-sepolia.g.alchemy.com/v2/${alchemyRpc}`
       : undefined
   );
 });
