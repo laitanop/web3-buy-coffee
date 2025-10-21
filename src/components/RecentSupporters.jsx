@@ -1,7 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useReadContract } from "wagmi";
+import { coffeeContractAddress, coffeeContractABI } from "../constanstAbi";
 import { Users, Coffee } from "lucide-react";
 
-const RecentSupporters = ({ supporters }) => {
+const RecentSupporters = () => {
+  const {
+    data: supporters,
+    isLoading,
+    error,
+  } = useReadContract({
+    address: coffeeContractAddress,
+    abi: coffeeContractABI,
+    functionName: "getCoffees",
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
       <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -38,9 +54,7 @@ const RecentSupporters = ({ supporters }) => {
 
                 <div className="flex items-center gap-1 bg-white px-3 py-1 rounded-full border border-secondary">
                   <span className="text-lg">☕</span>
-                  <span className="font-bold text-secondary">
-                    x{supporter.amount}
-                  </span>
+                  <span className="font-bold text-secondary">1</span>
                 </div>
               </div>
 
@@ -60,12 +74,6 @@ const RecentSupporters = ({ supporters }) => {
             <span className="text-gray-600 font-medium">Total Supporters:</span>
             <span className="font-bold text-secondary text-lg">
               {supporters.length}
-            </span>
-          </div>
-          <div className="flex justify-between items-center text-sm mt-2">
-            <span className="text-gray-600 font-medium">Total Coffees:</span>
-            <span className="font-bold text-secondary text-lg">
-              {supporters.reduce((sum, s) => sum + s.amount, 0)} ☕
             </span>
           </div>
         </div>
