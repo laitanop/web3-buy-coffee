@@ -44,7 +44,7 @@ const RecentSupporters = () => {
             <p className="text-lg">No supporters yet. Be the first!</p>
           </div>
         ) : (
-          supporters.map((supporter) => (
+          [...supporters].reverse().map((supporter) => (
             <div
               key={supporter.id}
               className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-200 hover:shadow-md transition-shadow duration-200"
