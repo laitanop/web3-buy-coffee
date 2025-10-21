@@ -59,14 +59,47 @@ const BuyCoffeeCard = () => {
 
   if (isPending || isConfirming) {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary mx-auto mb-4"></div>
-          <p className="text-gray-700 font-semibold">
+      <div className="bg-gradient-to-br from-amber-50 via-white to-orange-50 rounded-2xl shadow-xl p-8 border border-amber-200 flex items-center justify-center min-h-[400px] relative overflow-hidden">
+        {/* Animated background circles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-amber-200/30 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-orange-200/30 rounded-full blur-2xl animate-pulse delay-75"></div>
+        </div>
+
+        <div className="text-center relative z-10">
+          {/* Coffee cup with steam animation */}
+          <div className="relative mb-6">
+            <div className="relative inline-block">
+              {/* Steam animation */}
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="w-1 h-8 bg-gradient-to-t from-amber-400/60 to-transparent rounded-full animate-pulse"></div>
+                <div className="w-1 h-10 bg-gradient-to-t from-amber-500/60 to-transparent rounded-full animate-pulse delay-150"></div>
+                <div className="w-1 h-8 bg-gradient-to-t from-amber-400/60 to-transparent rounded-full animate-pulse delay-300"></div>
+              </div>
+
+              {/* Coffee icon with animation */}
+              <div className="bg-gradient-to-br from-amber-500 to-orange-600 p-6 rounded-full shadow-lg animate-bounce">
+                <Coffee className="w-12 h-12 text-white" />
+              </div>
+            </div>
+          </div>
+
+          {/* Loading text */}
+          <h3 className="text-2xl font-bold text-gray-800 mb-2 animate-pulse">
+            {isPending ? "Opening Wallet..." : "Brewing Your Coffee..."}
+          </h3>
+          <p className="text-gray-600 mb-6">
             {isPending
-              ? "Waiting for wallet approval..."
-              : "Confirming transaction..."}
+              ? "Please approve the transaction in your wallet"
+              : "Confirming your generous support on the blockchain"}
           </p>
+
+          {/* Progress dots */}
+          <div className="flex gap-2 justify-center">
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce delay-100"></div>
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce delay-200"></div>
+          </div>
         </div>
       </div>
     );

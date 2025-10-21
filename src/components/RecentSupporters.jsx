@@ -4,6 +4,18 @@ import { coffeeContractAddress, coffeeContractABI } from "../constanstAbi";
 import { Users, Coffee } from "lucide-react";
 
 const RecentSupporters = () => {
+  // Function to shorten wallet address
+  const shortenAddress = (address) => {
+    if (!address) return "";
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  // Function to format timestamp
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return "";
+    const date = new Date(Number(timestamp) * 1000);
+    return date.toLocaleString();
+  };
   const {
     data: supporters,
     isLoading,
@@ -17,7 +29,7 @@ const RecentSupporters = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
+  console.log("supporters", supporters);
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
       <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -46,8 +58,14 @@ const RecentSupporters = () => {
                     <p className="font-semibold text-gray-800">
                       {supporter.name}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      {supporter.timestamp}
+                    <p
+                      className="text-xs text-gray-500 font-mono cursor-pointer hover:text-secondary transition-colors"
+                      title={supporter.from}
+                    >
+                      {shortenAddress(supporter.from)}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {formatTimestamp(supporter.timestamp)}
                     </p>
                   </div>
                 </div>
